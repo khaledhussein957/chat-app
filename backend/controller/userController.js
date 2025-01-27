@@ -48,7 +48,6 @@ export const signup = async (req, res) => {
 			success: true,
 			message: "User created successfully",
 		});
-
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ success: false, message: error.message });
@@ -98,6 +97,20 @@ export const login = async (req, res) => {
 	} catch (error) {
 		console.log("Error in login ", error);
 		res.status(400).json({ success: false, message: error.message });
+	}
+};
+
+export const profile = async (req, res) => {
+	const userID = req.userId;
+	try {
+		const user = await User.findById(userID).select("-password");
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		res.status(200).json(user);
+	} catch (error) {
+		console.log("Error in profile ", error);
+		res.status(400).json({ message: error.message });
 	}
 };
 
@@ -298,4 +311,92 @@ export const deleteProfile = async (req, res) => {
         console.log("Error in deleteUser ", error);
         res.status(400).json({ message: error.message });
     }
+};
+
+export const followUser = async (req, res) => {
+	const userID = req.userId;
+	const { id } = req.params;
+	try {
+
+		const user = await User.findById(userID); // the user who wants to follow
+		const userToFollow = await User.findById(id); // the user to follow
+
+		// Check if the user and the user to follow exist
+		if(!user || !userToFollow) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		// Check if the user is already following the user to follow
+		if (user.following.includes(userToFollow._id)) {
+			return res.status(400).json({ message: "You already follow this user" });
+		}
+
+		// Check if the user to follow is not the same as the user
+		if (user._id.toString() === userToFollow._id.toString()) {
+			return res.status(400).json({ message: "You cannot follow yourself" });
+		}
+
+		// push the id to the following
+		user.following.push(userToFollow._id);
+
+		// Follow the user
+		await user.save();
+
+		res.status(200).json({ message: "User followed successfully" });
+	} catch (error) {
+		console.log("Error in followUser ", error);
+		res.status(400).json({ message: error.message });
+	}
+};
+
+export const unFollowUser = async (req, res) => {
+	const userID = req.userId;
+	const { id } = req.params;
+	try {
+		const user = await User.findById(userID); // the user who wants to unfollow
+		const userToUnFollow = await User.findById(id); // the user to unfollow
+
+		// Check if the user and the user to unfollow exist
+		if(! user || ! userToUnFollow) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		// Check if the user is not following the user to unfollow
+		if (!user.following.includes(userToUnFollow._id)) {
+			return res.status(400).json({ message: "You do not follow this user" });
+		}
+
+		// Check if the user to unfollow is not the same as the user
+		if (user._id.toString() === userToUnFollow._id.toString()) {
+			return res.status(400).json({ message: "You cannot unfollow yourself" });
+		}
+
+		// pull the the id from the following
+		user.following.pull(userToUnFollow._id);
+
+		// Unfollow the user
+		await user.save();
+
+		res.status(200).json({ message: "User unfollowed successfully" });
+	} catch (error) {
+		console.log("Error in unFollowUser ", error);
+		res.status(400).json({ message: error.message });
+	}
+};
+
+export const fetchAllUser = async (req, res) => {
+	try {
+
+		const userID = req.userId;
+
+		const filteredUsers = await User.find({ _id: { $ne: userID } }).select("-password"); // $ne means not equal to
+		if (!filteredUsers) {
+			return res.status(404).json({ message: "No users found" });
+		}
+
+		res.status(200).json(filteredUsers);
+		} catch (error) {
+			console.log("Error in fetchAllUser ", error);
+			res.status(400).json({ message: error.message });
+		}
 };

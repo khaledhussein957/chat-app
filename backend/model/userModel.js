@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			default: "",
 		},
+		following: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'User'
+			}
+		],
 		lastLogin: {
 			type: Date,
 			default: Date.now,
