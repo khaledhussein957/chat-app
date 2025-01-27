@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 import Group from "../model/groupModel.js";
 
 export const createGroup = async (req, res) => {
