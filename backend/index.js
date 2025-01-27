@@ -8,6 +8,7 @@ import connectDB from "./config/connectDB.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import statusRoutes from "./routes/statusRoutes.js";
+import groupRoutes from "./routes/groupRoutes.js";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/status", statusRoutes);
+app.use("/api/group", groupRoutes);
 
 
 app.listen(PORT, () => {
