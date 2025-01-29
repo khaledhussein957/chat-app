@@ -42,11 +42,25 @@ export const signup = async (req, res) => {
 
 		await user.save();
 
-        await sendVerificationEmail(email, verificationToken);
+        // await sendVerificationEmail(email, verificationToken);
+
+		// generate token
+		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+			expiresIn: "7d",
+		});
+
+		res.cookie("token", token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict",
+			maxAge: 7 * 24 * 60 * 60 * 1000,
+
+		});
         
 		res.status(201).json({
 			success: true,
 			message: "User created successfully",
+			user: { ...user._doc, password: undefined, token },
 		});
     } catch (error) {
         console.log(error.message);
@@ -66,16 +80,15 @@ export const login = async (req, res) => {
 			return res.status(400).json({ success: false, message: "Invalid credentials" });
 		}
 
-        // check is user if verifyed
-        if (!user.isVerified) {
-            return res.status(400).json({ success: false, message: "Please verify your email" });
-        }
+        // // check is user if verifyed
+        // if (!user.isVerified) {
+        //     return res.status(400).json({ success: false, message: "Please verify your email" });
+        // }
 
 		// generate token
 		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
 			expiresIn: "7d",
 		});
-
 
 		res.cookie("token", token, {
 			httpOnly: true,
@@ -90,7 +103,8 @@ export const login = async (req, res) => {
 
 		res.status(200).json({
 			success: true,
-			message: "Logged in successfully",
+			message: "User logged in successfully",
+			user: { ...user._doc, password: undefined, token },
 		});
 
 		console.log(`User ${user.name} logged in successfully`);
@@ -247,10 +261,10 @@ export const updateProfile = async (req, res) => {
             return res.status(400).json({ message: "Current password is required" });
         }
 
-        // check is user if verifyed
-        if (!user.isVerified) {
-            return res.status(400).json({ success: false, message: "Please verify your email" });
-        }
+        // // check is user if verifyed
+        // if (!user.isVerified) {
+        //     return res.status(400).json({ success: false, message: "Please verify your email" });
+        // }
 
         // Update user name
         user.name = name || user.name;
