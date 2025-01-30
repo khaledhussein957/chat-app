@@ -29,15 +29,16 @@ export const signup = async (req, res) => {
 
 		const hashedPassword = await bcryptjs.hash(password, 10); // 10 is the salt rounds
 
-        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit verification token
+        // const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit verification token
 
 
 		const user = new User({
 			email,
 			password: hashedPassword,
 			name,
-			verificationToken,
-			verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+			// verificationToken,
+			// console.log("Signup endpoint called");
+			// erificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
 		});
 
 		await user.save();
@@ -49,13 +50,17 @@ export const signup = async (req, res) => {
 			expiresIn: "7d",
 		});
 
-		res.cookie("token", token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "strict",
-			maxAge: 7 * 24 * 60 * 60 * 1000,
+		// res.cookie("token", token, {
+		// 	httpOnly: true,
+		// 	secure: process.env.NODE_ENV === "production",
+		// 	sameSite: "strict",
+		// 	maxAge: 7 * 24 * 60 * 60 * 1000,
 
-		});
+		// });
+
+		// set the token to the bearer
+
+
         
 		res.status(201).json({
 			success: true,
@@ -401,9 +406,9 @@ export const unFollowUser = async (req, res) => {
 export const fetchAllUser = async (req, res) => {
 	try {
 
-		const userID = req.userId;
+		// const userID = req.userId;
 
-		const filteredUsers = await User.find({ _id: { $ne: userID } }).select("-password"); // $ne means not equal to
+		const filteredUsers = await User.find().select("-password"); // $ne means not equal to
 		if (!filteredUsers) {
 			return res.status(404).json({ message: "No users found" });
 		}

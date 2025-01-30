@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/controller/authController/login_controller.dart';
-import 'package:frontend/pages/auth/signup.dart';
+import 'package:frontend/pages/chat_screen.dart';
+import 'package:frontend/pages/signup.dart';
+import 'package:frontend/services/user_services.dart';
+
 import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,6 +13,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final UserController userController = Get.put(UserController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,28 +38,41 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 65,
                 ),
                 TextField(
-                  controller: LoginController().emailController,
+                  controller: emailController,
                   decoration: InputDecoration(labelText: 'Enter your email'),
                 ),
                 SizedBox(
                   height: 17.48,
                 ),
                 TextField(
-                  controller: LoginController().passwordController,
+                  controller: passwordController,
+                  obscureText: true,
                   decoration: InputDecoration(labelText: 'Enter your password'),
                 ),
                 SizedBox(
                   height: 34.48,
                 ),
-                ElevatedButton(
-                  onPressed: () => LoginController().login(),
-                  child: Text('Login'),
-                  style: ElevatedButton.styleFrom(
-                      minimumSize: Size(245, 36.52),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      )),
-                ),
+                Obx(() {
+                  if (userController.isLoggedIn.value) {
+                    Get.to(ChatScreen());
+                  }
+                  return ElevatedButton(
+                    onPressed: () {
+                      userController.login(
+                        emailController.text.trim(),
+                        passwordController.text,
+                      );
+
+                      Get.to(ChatScreen());
+                    },
+                    child: Text('Login'),
+                    style: ElevatedButton.styleFrom(
+                        minimumSize: Size(245, 36.52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        )),
+                  );
+                }),
                 SizedBox(
                   height: 17.48,
                 ),

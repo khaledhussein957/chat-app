@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class UnFollowingUsersScreen extends StatelessWidget {
-  const UnFollowingUsersScreen({super.key});
+class FollowingUsersScreen extends StatelessWidget {
+  const FollowingUsersScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +10,8 @@ class UnFollowingUsersScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         return ListTile(
           leading: CircleAvatar(
-            // Replace with actual user image or initials
+            backgroundImage:
+                NetworkImage('https://www.just.edu.so/assets/images/black.png'),
             child: Text('YM'),
           ),
           title: Text('Yasser mohamud'),
@@ -18,7 +19,7 @@ class UnFollowingUsersScreen extends StatelessWidget {
             // Navigate to chat details screen
           },
           trailing: IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.remove),
             onPressed: () {
               // Handle follow button press
             },
